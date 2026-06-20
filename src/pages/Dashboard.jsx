@@ -2,20 +2,14 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useAuth } from '../lib/AuthContext'
 import { supabase } from '../lib/supabase'
-
-const HOUSING = [
-  { level: 0, name: 'Studio Apartment', emoji: '🏠', ep: 0 },
-  { level: 1, name: 'Small Apartment', emoji: '🏡', ep: 10000 },
-  { level: 2, name: 'Townhome', emoji: '🏘️', ep: 50000 },
-  { level: 3, name: 'House', emoji: '🏰', ep: 150000 },
-  { level: 4, name: 'Luxury Home', emoji: '🏛️', ep: 500000 },
-  { level: 5, name: 'Mansion', emoji: '🏆', ep: 1000000 },
-]
+import { HOUSING } from '../lib/housingConfig'
+import HouseInteriorModal from '../a/HouseInteriorModal'
 
 export default function Dashboard() {
   const { profile, refreshProfile } = useAuth()
   const [leaderboardRank, setLeaderboardRank] = useState(null)
   const [referralCount, setReferralCount] = useState(0)
+  const [showHomeModal, setShowHomeModal] = useState(false)
 
   useEffect(() => {
     refreshProfile()
@@ -105,13 +99,18 @@ export default function Dashboard() {
         </div>
 
         {/* Housing progression */}
-        <div className="card" style={{ marginBottom: 16 }}>
+        <button
+          onClick={() => setShowHomeModal(true)}
+          className="card"
+          style={{ marginBottom: 16, width: '100%', textAlign: 'left', display: 'block' }}
+        >
           <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 14 }}>
             <div style={{ fontSize: 40 }}>{housing.emoji}</div>
             <div style={{ flex: 1 }}>
-              <div style={{ fontSize: 11, color: '#8A82A0', letterSpacing: 1 }}>YOUR HOUSING</div>
+              <div style={{ fontSize: 11, color: '#8A82A0', letterSpacing: 1 }}>YOUR HOUSING · TAP TO VIEW</div>
               <div style={{ fontWeight: 800, fontSize: 16 }}>{housing.name}</div>
             </div>
+            <div style={{ color: '#F0A830', fontSize: 16 }}>👁️</div>
           </div>
           {nextHousing && (
             <>
@@ -129,7 +128,7 @@ export default function Dashboard() {
               </div>
             </>
           )}
-        </div>
+        </button>
 
         {/* Quick actions */}
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 16 }}>
@@ -144,7 +143,8 @@ export default function Dashboard() {
         {/* Referral CTA */}
         <Link to="/referrals" className="card" style={{
           display: 'flex', alignItems: 'center', gap: 14, textDecoration: 'none',
-          border: '1px dashed rgba(160,110,240,0.4)', background: 'rgba(160,110,240,0.06)'
+          border: '1px dashed rgba(160,110,240,0.4)', background: 'rgba(160,110,240,0.06)',
+          marginBottom: 16
         }}>
           <div style={{ fontSize: 28 }}>🎁</div>
           <div style={{ flex: 1 }}>
@@ -154,7 +154,28 @@ export default function Dashboard() {
           <div style={{ color: '#A06EF0', fontSize: 18 }}>→</div>
         </Link>
 
+        {/* My Home full page link */}
+        <Link to="/home" className="card" style={{
+          display: 'flex', alignItems: 'center', gap: 14, textDecoration: 'none',
+          border: '1px dashed rgba(240,168,48,0.4)', background: 'rgba(240,168,48,0.06)'
+        }}>
+          <div style={{ fontSize: 28 }}>🗝️</div>
+          <div style={{ flex: 1 }}>
+            <div style={{ fontWeight: 700, fontSize: 14 }}>Tour every housing tier</div>
+            <div style={{ fontSize: 12, color: '#8A82A0' }}>See what Studio through Mansion looks like</div>
+          </div>
+          <div style={{ color: '#F0A830', fontSize: 18 }}>→</div>
+        </Link>
+
       </div>
+
+      {showHomeModal && (
+        <HouseInteriorModal
+          tier={housing}
+          currentLevel={profile.housing_level}
+          onClose={() => setShowHomeModal(false)}
+        />
+      )}
     </div>
   )
 }
