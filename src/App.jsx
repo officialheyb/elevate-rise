@@ -9,6 +9,7 @@ import Leaderboard from './pages/Leaderboard'
 import Referrals from './pages/Referrals'
 import Profile from './pages/Profile'
 import Admin from './pages/Admin'
+import MyHome from './pages/MyHome'
 import BottomNav from './components/BottomNav'
 
 function PrivateRoute({ children }) {
@@ -43,6 +44,7 @@ export default function App() {
         <Route path="/login" element={session ? <Navigate to="/" /> : <Login />} />
         <Route path="/register" element={session ? <Navigate to="/" /> : <Register />} />
         <Route path="/" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
+        <Route path="/home" element={<PrivateRoute><MyHome /></PrivateRoute>} />
         <Route path="/tap" element={<PrivateRoute><Tap /></PrivateRoute>} />
         <Route path="/sessions" element={<PrivateRoute><Sessions /></PrivateRoute>} />
         <Route path="/leaderboard" element={<PrivateRoute><Leaderboard /></PrivateRoute>} />
