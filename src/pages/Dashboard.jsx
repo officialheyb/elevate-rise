@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import { useAuth } from '../lib/AuthContext'
 import { supabase } from '../lib/supabase'
 import { HOUSING } from '../lib/housingConfig'
-import HouseInteriorModal from '../a/HouseInteriorModal'
+import HouseInteriorModal from '../components/HouseInteriorModal'
 
 export default function Dashboard() {
   const { profile, refreshProfile } = useAuth()
