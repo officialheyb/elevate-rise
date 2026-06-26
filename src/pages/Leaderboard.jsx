@@ -1,12 +1,14 @@
 import { useState, useEffect } from 'react'
 import { useAuth } from '../lib/AuthContext'
 import { supabase } from '../lib/supabase'
+import PublicProfileModal from '../components/PublicProfileModal'
 
 export default function Leaderboard() {
   const { profile } = useAuth()
   const [tab, setTab] = useState('all_time')
   const [rows, setRows] = useState([])
   const [loading, setLoading] = useState(true)
+  const [selectedUser, setSelectedUser] = useState(null)
 
   useEffect(() => {
     fetchLeaderboard(tab)
@@ -19,7 +21,7 @@ export default function Leaderboard() {
     if (period === 'all_time') {
       const { data } = await supabase
         .from('profiles')
-        .select('id, username, total_ep, rank_label, character_gender')
+        .select('id, username, total_ep, rank_label, character_gender, housing_level, current_streak')
         .order('total_ep', { ascending: false })
         .limit(50)
       setRows(data || [])
@@ -31,7 +33,7 @@ export default function Leaderboard() {
 
       const { data } = await supabase
         .from('daily_activity')
-        .select('user_id, ep_earned_today, profiles(username, character_gender, rank_label)')
+        .select('user_id, ep_earned_today, profiles(username, character_gender, rank_label, housing_level, current_streak)')
         .gte('activity_date', sinceStr)
 
       const totals = {}
@@ -42,6 +44,8 @@ export default function Leaderboard() {
             username: row.profiles?.username,
             character_gender: row.profiles?.character_gender,
             rank_label: row.profiles?.rank_label,
+            housing_level: row.profiles?.housing_level,
+            current_streak: row.profiles?.current_streak,
             total_ep: 0
           }
         }
@@ -95,11 +99,17 @@ export default function Leaderboard() {
               const isMe = row.id === profile?.id
               const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : null
               return (
-                <div key={row.id} className="card" style={{
-                  display: 'flex', alignItems: 'center', gap: 12, padding: '12px 16px',
-                  border: isMe ? '1.5px solid rgba(240,168,48,0.4)' : '1px solid rgba(255,255,255,0.06)',
-                  background: isMe ? 'rgba(240,168,48,0.06)' : '#161024'
-                }}>
+                <button
+                  key={row.id}
+                  onClick={() => setSelectedUser(row)}
+                  className="card"
+                  style={{
+                    display: 'flex', alignItems: 'center', gap: 12, padding: '12px 16px',
+                    border: isMe ? '1.5px solid rgba(240,168,48,0.4)' : '1px solid rgba(255,255,255,0.06)',
+                    background: isMe ? 'rgba(240,168,48,0.06)' : '#161024',
+                    width: '100%', textAlign: 'left', cursor: 'pointer'
+                  }}
+                >
                   <div style={{
                     width: 28, textAlign: 'center', fontWeight: 800, fontSize: medal ? 20 : 14,
                     color: medal ? 'inherit' : '#8A82A0'
@@ -125,12 +135,16 @@ export default function Leaderboard() {
                     </div>
                     <div style={{ fontSize: 10, color: '#8A82A0' }}>EP</div>
                   </div>
-                </div>
+                </button>
               )
             })}
           </div>
         )}
       </div>
+
+      {selectedUser && (
+        <PublicProfileModal user={selectedUser} onClose={() => setSelectedUser(null)} />
+      )}
     </div>
   )
 }
