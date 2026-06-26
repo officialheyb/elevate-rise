@@ -13,7 +13,7 @@ function getWindowStatus(hour) {
   const m = now.getMinutes()
   const nowMins = h * 60 + m
   const windowStart = hour * 60
-  const windowEnd = hour * 60 + 30
+  const windowEnd = hour * 60 + 60
 
   if (nowMins >= windowStart && nowMins <= windowEnd) return 'open'
   if (nowMins < windowStart) return 'upcoming'
